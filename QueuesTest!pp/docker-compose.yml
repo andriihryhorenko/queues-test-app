@@ -1,0 +1,54 @@
+version: '3.4'
+
+services:
+
+
+
+    #        command: --port 6380
+    #ports:
+    #  - "6380:6380"
+    #expose:
+    #  - "6380"
+
+
+  redis-rdb:
+    image: "redis:alpine"
+    command: redis-server --maxmemory 256mb --save 30 10 --dbfilename rdb-dump.rdb --rdbcompression yes
+    ports:
+        - "6379:6379"
+    volumes:
+        - ./redis-rdb-data:/var/lib/redis
+
+  redis-aof:
+    image: "redis:alpine"
+    command: redis-server --port 6380 --maxmemory 256mb --appendonly yes --appendfilename "aof-dump.aof" --appendfsync everysec
+    ports:
+       - "6380:6380"
+    expose:
+       - "6380"
+    volumes:
+        - ./redis-aof-data:/var/lib/redis
+
+
+
+  beanstalkd:
+    image: placeloop/beanstalkd
+    container_name: beanstalkd-server
+    ports:
+      - 11300:11300
+    volumes:
+      - ./beanstalkd-data:/binlog
+
+  queuestestpp:
+    container_name: queuestestapp
+    image: ${DOCKER_REGISTRY-}queuestestpp
+    ports:
+        - "9901:80"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+        - beanstalkd
+
+volumes:
+  beanstalkd_data:

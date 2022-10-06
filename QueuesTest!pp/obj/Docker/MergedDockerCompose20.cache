@@ -1,0 +1,86 @@
+name: dockercompose15021848651413526876
+services:
+  beanstalkd:
+    container_name: beanstalkd-server
+    image: placeloop/beanstalkd
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 11300
+      published: "11300"
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: D:\GITHub\redis-test-app\queues-test-app\QueuesTest!pp\beanstalkd-data
+      target: /binlog
+      bind:
+        create_host_path: true
+  queuestestpp:
+    build:
+      context: D:\GITHub\redis-test-app\queues-test-app\QueuesTest!pp
+      dockerfile: Dockerfile
+    container_name: queuestestapp
+    depends_on:
+      beanstalkd:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    image: queuestestpp
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      protocol: tcp
+    - mode: ingress
+      target: 80
+      published: "9901"
+      protocol: tcp
+  redis-aof:
+    command:
+    - redis-server
+    - --maxmemory
+    - 256mb
+    - --save
+    - "30"
+    - "10"
+    image: redis:alpine
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 6380
+      published: "6380"
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: D:\GITHub\redis-test-app\queues-test-app\QueuesTest!pp\redis-aof-data
+      target: /var/lib/redis
+      bind:
+        create_host_path: true
+  redis-rdb:
+    command:
+    - redis-server
+    - --maxmemory
+    - 256mb
+    - --save
+    - "300"
+    - "10"
+    image: redis:alpine
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 6379
+      published: "6379"
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: D:\GITHub\redis-test-app\queues-test-app\QueuesTest!pp\redis-rdb-data
+      target: /var/lib/redis
+      bind:
+        create_host_path: true
+networks:
+  default:
+    name: dockercompose15021848651413526876_default

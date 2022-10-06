@@ -1,0 +1,22 @@
+name: dockercompose15021848651413526876
+services:
+  queuestestpp:
+    build:
+      context: D:\GITHub\redis-test-app\queues-test-app\QueuesTest!pp
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    image: queuestestpp
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      protocol: tcp
+    - mode: ingress
+      target: 80
+      published: "9901"
+      protocol: tcp
+networks:
+  default:
+    name: dockercompose15021848651413526876_default

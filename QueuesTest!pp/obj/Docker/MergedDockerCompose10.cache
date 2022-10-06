@@ -1,0 +1,39 @@
+name: dockercompose15021848651413526876
+services:
+  beanstalkd:
+    container_name: beanstalkd-server
+    image: placeloop/beanstalkd
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 11300
+      published: "11300"
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: D:\GITHub\redis-test-app\queues-test-app\QueuesTest!pp\beanstalkd-data
+      target: /binlog
+      bind:
+        create_host_path: true
+  queuestestpp:
+    build:
+      context: D:\GITHub\redis-test-app\queues-test-app\QueuesTest!pp
+      dockerfile: Dockerfile
+    container_name: queuestestapp
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    image: queuestestpp
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      protocol: tcp
+    - mode: ingress
+      target: 80
+      published: "9901"
+      protocol: tcp
+networks:
+  default:
+    name: dockercompose15021848651413526876_default
