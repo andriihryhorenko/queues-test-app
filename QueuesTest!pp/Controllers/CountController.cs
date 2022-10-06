@@ -40,8 +40,7 @@ namespace QueuesTest_pp.Controllers
 
             using (var client = new BeanstalkConnection("beanstalkd", 11300))
             {
-                await client.Use("mytube");
-                var stats = await client.Stats();
+                var stats = await client.StatsTube("default");
                 return Ok(stats);
        
 

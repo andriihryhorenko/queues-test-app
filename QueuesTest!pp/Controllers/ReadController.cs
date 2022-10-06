@@ -37,31 +37,43 @@ namespace QueuesTest_pp.Controllers
             var log = new StringBuilder();
             Stopwatch main = new Stopwatch();
 
-
-
-            var i = 0;
-            using (var client = new BeanstalkConnection("beanstalkd", 11300))
+            try
             {
-                main.Start();
-                await client.Watch("mytube");
-                while (i<count)
+
+                var i = 0;
+                using (var client = new BeanstalkConnection("beanstalkd", 11300))
                 {
-                    var job = await client.Reserve(TimeSpan.FromSeconds(10));
-                  
-                    if (job == null)
+                    main.Start();
+                    var tubes = await client.ListTubes();
+                    var stats = await client.StatsTube("default");
+                    await client.Watch("default");
+                    
+                    while (i < count)
                     {
-                        break;
+                        var job = await client.Reserve();
+
+                        if (job == null)
+                        {
+                            break;
+                        }
+                        i++;
+                        await client.Delete(job.Id);
                     }
-                    i++;
-                    await client.Delete(job.Id);
+
+                    main.Stop();
+
                 }
 
-                main.Stop();
+                log.AppendLine($"Full execution: {main.Elapsed}, Count {i}");
+                return Ok(new { Log = log.ToString() });
+            }
+            catch (Exception ex)
+            {
+                var asd = ex;
+                throw;
 
             }
 
-            log.AppendLine($"Full execution: {main.Elapsed}, Count {i}");
-            return Ok(new { Log = log.ToString() });
 
 
         }

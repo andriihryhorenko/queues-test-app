@@ -45,7 +45,7 @@ namespace QueuesTest_pp.Controllers
             using (var client = new BeanstalkConnection("beanstalkd", 11300))
             {
                 main.Start();
-                await client.Use("mytube");
+                await client.Use("default");
                 foreach(var user in users)
                 {
                     await client.Put(JsonConvert.SerializeObject(user));
